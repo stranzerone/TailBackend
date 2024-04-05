@@ -1,5 +1,7 @@
 import sql from "../Database.js";
 
+import bcrypt from "bcrypt"
+
 export const addUser = async (req, res) => {
   try {
     const { name, email, username, password } = req.body;
@@ -21,10 +23,14 @@ if(checkUsername.length>0){
 else{
 
 
+  const salt = await bcrypt.genSalt(10); // 10 is the saltRounds
+
+  const pass = await bcrypt.hash(password,salt)
+
 
     const result = await sql`
       INSERT INTO users (name, email, username, password)
-      VALUES (${name}, ${email}, ${username}, ${password})
+      VALUES (${name}, ${email}, ${username}, ${pass})
     `;
 
     res.status(200).json({ message: 'User added successfully', data: result });
